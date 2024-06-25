@@ -72,7 +72,36 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
+def dfs_depth(problem: SearchProblem, dep,st,res,vis,flag=[]):
+    cur=st.pop()
+    st.push(cur)
+    vis[cur]=1
+    if problem.isGoalState(cur):
+        flag.append(1)
+        return
+    for next in problem.getSuccessors(cur):
+        if next[0] not in vis:
+            st.push(next[0])
+            res.append(next[1])
+            temp = dfs_depth(problem, dep+1, st,res,vis,flag) 
+            if(flag!=[]):
+                return
+            st.pop()
+            res.pop()
+    del vis[cur]
+    return 
+
+    
 def depthFirstSearch(problem: SearchProblem):
+    st =util.Stack()
+    st.push(problem.getStartState())
+    res=[]
+    vis={}
+    dfs_depth(problem,0,st,res,vis)
+    # st
+    # util.raiseNotDefined()
+    return  res
     """
     Search the deepest nodes in the search tree first.
 
@@ -82,22 +111,67 @@ def depthFirstSearch(problem: SearchProblem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # print("Start:", problem.getStartState())
+    # print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+# problem.getSuccessors(problem.getStartState()))
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    st = util.Queue()
+    com={}
+    com[problem.getStartState()]="None"
+    di={}
+    di[problem.getStartState()]="None"
+    st.push(problem.getStartState())
+    cur=-1
+    while not st.isEmpty():
+        cur = st.pop()
+        if problem.isGoalState(cur):
+            break
+        for next in problem.getSuccessors(cur):
+            if next[0] not in com:
+                com[next[0]]=cur
+                di[next[0]]=next[1]
+                st.push(next[0])
+    res=[]
+    
+    while com[cur]!="None":
+        res.append(di[cur])
+        cur=com[cur]
+    res.reverse()
+    return res
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    st = util.PriorityQueue()
+    st.push(problem.getStartState(),0)
+    dist={} 
+    dist[problem.getStartState()]=0
+    di={}
+    di[problem.getStartState()]=[]
+    vis={}
+    cur=-1
+    while not st.isEmpty():
+        cur = st.pop()
+        if(cur in vis):
+            continue
+
+        if problem.isGoalState(cur):
+            return di[cur]
+        for next in problem.getSuccessors(cur):
+            tmp=di[cur].copy()
+            tmp.append(next[1])
+            cost=problem.getCostOfActions(tmp)
+            if next[0] not in dist or cost<dist[next[0]]:
+                dist[next[0]]=cost
+                di[next[0]]=tmp
+                st.update(next[0],cost)
 
 def nullHeuristic(state, problem=None):
     """
@@ -109,7 +183,31 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    st = util.PriorityQueue()
+    st.push(problem.getStartState(),0+heuristic(problem.getStartState(),problem))
+    dist={} 
+    dist[problem.getStartState()]=0
+    di={}
+    di[problem.getStartState()]=[]
+    vis={}
+    cur=-1
+    while not st.isEmpty():
+        cur = st.pop()
+        if(cur in vis):
+            continue
+
+        if problem.isGoalState(cur):
+            return di[cur]
+        for next in problem.getSuccessors(cur):
+            tmp=di[cur].copy()
+            tmp.append(next[1])
+            cost=problem.getCostOfActions(tmp)+heuristic(next[0],problem)
+            if next[0] not in dist or cost<dist[next[0]]:
+                dist[next[0]]=cost
+                di[next[0]]=tmp
+                st.update(next[0],cost)
+    
+
 
 
 # Abbreviations
