@@ -290,20 +290,37 @@ class CornersProblem(search.SearchProblem):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
 
+    def iscorner(self, pos: Any):
+        for i in range(4):
+            if pos == self.corners[i]:
+                return i
+        return -1
+    def getstate(self, state: Any):
+        tmp=self.iscorner(state[4])
+        if tmp==-1 :
+            return state
+        return state[:tmp]+(1,) + state[tmp+1:]
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        tmp=self.iscorner(self.startingPosition)
+        if tmp==-1 :
+            return (0,0,0,0,self.startingPosition)
+        else :
+            return (0,0,0,0)[:tmp]+(1,) + (0,0,0)[:3-tmp] + (self.startingPosition)
+
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # print(state)
+        
+        return state[0]==1 and state[1]==1 and state[2]==1 and state[3]==1
 
     def getSuccessors(self, state: Any):
         """
@@ -315,16 +332,23 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
+        currentPosition = state[4]
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
 
+            x,y = currentPosition
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if hitsWall:
+                continue
+            tmpstate=state[:4]+((nextx,nexty),)
+            tmpstate=self.getstate(tmpstate)
+            # print("!!"+str(tmpstate))
+            cost = 1
+            successors.append((tmpstate,action,cost))
             "*** YOUR CODE HERE ***"
 
         self._expanded += 1 # DO NOT CHANGE
@@ -359,8 +383,20 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    pos=state[4]
+    cost=0
+    wich=-1
+    for i in range(4):
+        if state[i]==1:
+            continue
+        if cost<abs(pos[0]-corners[i][0])+abs(pos[1]-corners[i][1]):
+            cost=abs(pos[0]-corners[i][0])+abs(pos[1]-corners[i][1])
+            wich=i
+    # if wich!=-1:
+
 
     "*** YOUR CODE HERE ***"
+    return cost
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
@@ -454,6 +490,26 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    siz=0
+    dic={}
+    L=10000000
+    R=0
+    D=0
+    U=10000000
+    for food in foodGrid.asList():
+        siz+=1
+        L=min(L,food[0])
+        R=max(R,food[0])
+        U=min(U,food[1])
+        D=max(D,food[1])
+    if siz==0:
+        return 0
+    dl=max(0,position[0]-L)
+    dr=max(0,R-position[0])
+    du=max(0,position[1]-U)
+    dd=max(0,D-position[1])
+    return dl+dr+du+dd+min(dl,dr)+min(du,dd)
+    return tmp
     "*** YOUR CODE HERE ***"
     return 0
 
@@ -484,6 +540,23 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
+        st=[(startPosition,0,[])]
+        h=0
+        vis={}
+        vis[startPosition]=1
+        while h<len(st):
+            cur=st[h]
+            h+=1
+            if food[cur[0][0]][cur[0][1]]:
+                return cur[2]
+            for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+                x,y = cur[0]
+                dx, dy = Actions.directionToVector(action)
+                nextx, nexty = int(x + dx), int(y + dy)
+                if not walls[nextx][nexty]:
+                    if (nextx,nexty) not in vis:
+                        st.append(((nextx,nexty),1+cur[1],cur[2]+[action]))
+                        vis[(nextx,nexty)]=1
 
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()

@@ -73,19 +73,19 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 
-def dfs_depth(problem: SearchProblem, dep,st,res,vis,flag=[]):
+def dfs_depth(problem: SearchProblem, dep,st,res,vis,flag):
     cur=st.pop()
     st.push(cur)
     vis[cur]=1
     if problem.isGoalState(cur):
-        flag.append(1)
+        flag[0]=1
         return
     for next in problem.getSuccessors(cur):
         if next[0] not in vis:
             st.push(next[0])
             res.append(next[1])
             temp = dfs_depth(problem, dep+1, st,res,vis,flag) 
-            if(flag!=[]):
+            if(flag[0]!=0):
                 return
             st.pop()
             res.pop()
@@ -98,7 +98,7 @@ def depthFirstSearch(problem: SearchProblem):
     st.push(problem.getStartState())
     res=[]
     vis={}
-    dfs_depth(problem,0,st,res,vis)
+    dfs_depth(problem,0,st,res,vis,[0])
     # st
     # util.raiseNotDefined()
     return  res
