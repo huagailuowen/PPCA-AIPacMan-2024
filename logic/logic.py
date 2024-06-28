@@ -704,7 +704,7 @@ def exprClausesToIndexClauses(clauses, symbol_dict):
             # If literal is symbol, convert to index and add it.
             # Otherwise it is ~symbol, in which case, we extract the symbol, 
             # convert it to index, and add the negative of the index
-            if len(lit.args) == 0:
+            if len(lit.args) ==  0:
                 c_int += [symbol_dict[lit]]
             else:
                 c_int += [-symbol_dict[lit.args[0]]]
