@@ -100,9 +100,34 @@ def joinFactors(factors: List[Factor]):
                     "Input factors: \n" +
                     "\n".join(map(str, factors)))
 
-
+    
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    factors_ = [i for i in factors]
+    conditioned_variables = []
+    unconditioned_variables = []
+    variablesDomainDict = factors_[0].variableDomainsDict()
+
+    for factor in factors:
+        for var in factor.unconditionedVariables():
+            if var not in unconditioned_variables:
+                unconditioned_variables.append(var)
+            if var in conditioned_variables:
+                conditioned_variables.remove(var)
+        for var in factor.conditionedVariables():
+            if var not in unconditioned_variables :
+                if var not in conditioned_variables:
+                    conditioned_variables.append(var)
+
+    res = Factor(unconditioned_variables, conditioned_variables, variablesDomainDict)
+
+    possible_case = res.getAllPossibleAssignmentDicts()
+    for case in possible_case:
+        prob = 1
+        for factor in factors_:
+            prob *= factor.getProbability(case)
+        res.setProbability(case, prob)
+    return res
+
     "*** END YOUR CODE HERE ***"
 
 ########### ########### ###########
@@ -153,7 +178,20 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        unconditioned_variables = [i for i in factor.unconditionedVariables() if i != eliminationVariable]
+        coditioned_variables = [i for i in factor.conditionedVariables()]
+        variablesDomainDict = factor.variableDomainsDict()
+
+        res=Factor(unconditioned_variables, coditioned_variables, variablesDomainDict)
+        possible_case = res.getAllPossibleAssignmentDicts()
+        for case in possible_case:
+            prob = 0
+            for value in factor.variableDomainsDict()[eliminationVariable]:
+                case[eliminationVariable] = value
+                prob += factor.getProbability(case)
+            res.setProbability(case, prob)
+
+        return res
         "*** END YOUR CODE HERE ***"
 
     return eliminate
