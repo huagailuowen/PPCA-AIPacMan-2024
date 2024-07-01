@@ -1,2 +1,4 @@
 multiagent1/
 __pycache__/
+myenv
+.vscode

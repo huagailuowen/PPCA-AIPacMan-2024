@@ -117,17 +117,19 @@ def findModelUnderstandingCheck() -> Dict[Expr, bool]:
     You should not use findModel or Expr in this method.
     """
     # a = {'op':'a', 'args':[]}
-    class myExpr:
-        """dummy('A') has representation A, unlike a string 'A' that has repr 'A'.
-        Of note: Expr('Name') has representation Name, not 'Name'.
-        """
-        def __init__(self, op: str ):
-            self.op = op
+    # class myExpr:
+    #     """dummy('A') has representation A, unlike a string 'A' that has repr 'A'.
+    #     Of note: Expr('Name') has representation Name, not 'Name'.
+    #     """
+    #     def __init__(self, op: str ):
+    #         self.op = op
         
-        def __repr__(self):
-            return self.op
+    #     def __repr__(self):
+    #         return self.op
+    a=Expr('A')
+    a.op='a'
     "*** BEGIN YOUR CODE HERE ***"
-    return {myExpr('a'): True}
+    return {a: True}
     "*** BEGIN YOUR CODE HERE ***"
     # class myExpr:
     #     def __init__(self, op, *args):
