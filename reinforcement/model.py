@@ -12,8 +12,8 @@ class DeepQNetwork():
         # Remember to set self.learning_rate, self.numTrainingGames,
         # self.parameters, and self.batch_size!
         "*** YOUR CODE HERE ***"
-        self.learning_rate = 6
-        self.numTrainingGames = 8000
+        self.learning_rate = 1
+        self.numTrainingGames = 10000
         self.batch_size = 128
         self.parameters = []
         self.cnt=0
