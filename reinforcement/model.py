@@ -12,7 +12,23 @@ class DeepQNetwork():
         # Remember to set self.learning_rate, self.numTrainingGames,
         # self.parameters, and self.batch_size!
         "*** YOUR CODE HERE ***"
-
+        self.learning_rate = 6
+        self.numTrainingGames = 8000
+        self.batch_size = 128
+        self.parameters = []
+        self.cnt=0
+        # w1
+        self.parameters.append(nn.Parameter(self.state_size, 500))
+        #b1
+        self.parameters.append(nn.Parameter(1, 500))
+        # w2
+        self.parameters.append(nn.Parameter(500, 300))
+        #b2
+        self.parameters.append(nn.Parameter(1, 300))
+        # w3
+        self.parameters.append(nn.Parameter(300, self.num_actions))
+        #b3
+        self.parameters.append(nn.Parameter(1, self.num_actions))
     def set_weights(self, layers):
         self.parameters = []
         for i in range(len(layers)):
@@ -29,6 +45,9 @@ class DeepQNetwork():
             loss node between Q predictions and Q_target
         """
         "*** YOUR CODE HERE ***"
+        Q_pred = self.run(states)
+        loss = nn.SquareLoss(Q_pred, Q_target)
+        return loss
 
     def run(self, states):
         """
@@ -44,6 +63,20 @@ class DeepQNetwork():
                 scores, for each of the actions
         """
         "*** YOUR CODE HERE ***"
+        actions = []
+        for i in range(self.num_actions):
+            actions.append(i)
+        # import copy
+        # Q_pred = copy.deepcopy(states)
+        Q_pred=states
+        assert len(self.parameters) % 2 == 0
+        for i in range(0, len(self.parameters) - 2, 2):
+            Q_pred = nn.Linear(Q_pred, self.parameters[i])
+            Q_pred = nn.AddBias(Q_pred, self.parameters[i + 1])
+            Q_pred = nn.ReLU(Q_pred)
+        Q_pred = nn.AddBias(nn.Linear(Q_pred, self.parameters[-2]), self.parameters[-1])
+        # Q_pred = nn.ReLU(Q_pred)
+        return Q_pred
 
     def gradient_update(self, states, Q_target):
         """
@@ -55,3 +88,17 @@ class DeepQNetwork():
             None
         """
         "*** YOUR CODE HERE ***"
+        loss = self.get_loss(states, Q_target)
+        # print(self.parameters)
+        gradients = nn.gradients(loss, self.parameters)
+        # print(gradients)
+        # assert 0
+        for i in range(len(self.parameters)):
+            self.parameters[i].update(gradients[i], -self.learning_rate)
+        self.cnt+=1
+        if(self.cnt>7000):
+            self.learning_rate=0.5
+        elif(self.cnt>4000):
+            self.learning_rate=2
+
+        return None
