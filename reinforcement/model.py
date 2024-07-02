@@ -95,10 +95,10 @@ class DeepQNetwork():
         # assert 0
         for i in range(len(self.parameters)):
             self.parameters[i].update(gradients[i], -self.learning_rate)
-        self.cnt+=1
-        if(self.cnt>7000):
-            self.learning_rate=0.5
-        elif(self.cnt>4000):
-            self.learning_rate=2
+        # self.cnt+=1
+        # if(self.cnt>7000):
+        #     self.learning_rate=0.5
+        # elif(self.cnt>4000):
+        #     self.learning_rate=2
 
         return None
