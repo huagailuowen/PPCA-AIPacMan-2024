@@ -508,8 +508,8 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     dr=max(0,R-position[0])
     du=max(0,position[1]-U)
     dd=max(0,D-position[1])
-    if siz==1:
-        return dl+dr+du+dd+min(dl,dr)+min(du,dd)
+    # if siz==1:
+    return dl+dr+du+dd+min(dl,dr)+min(du,dd)
     cost=0
     mx=0
     for i in foodGrid.asList():
