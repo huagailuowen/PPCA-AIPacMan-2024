@@ -20,6 +20,7 @@ class PacmanDeepQAgent(PacmanQAgent):
         self.update_frequency = 3
         self.counts = None
         self.replay_memory = ReplayMemory(50000)
+        # self.replay_memory = torch.load("replay_memory_3000.pth")
         self.min_transitions_before_training = 10000
         self.td_error_clipping = 10
 
@@ -52,9 +53,16 @@ class PacmanDeepQAgent(PacmanQAgent):
 
     def initialize_q_networks(self, state_dim, action_dim=5):
         import model
+
         self.model = model.DeepQNetwork(state_dim, action_dim)
         self.target_model = model.DeepQNetwork(state_dim, action_dim)
+        # state=torch.load('model_3000.pth')
+        # new_state = {f"module_.{k}": v for k, v in state.items()}
+        # self.model.load_state_dict(new_state)
+        # self.target_model.load_state_dict(new_state)
 
+        # self.model = torch.load('model_3000.pth')
+        # self.target_model = torch.load('model_3000.pth')
     def getQValue(self, state, action):
         """
           Should return Q(state,action) as predicted by self.model
@@ -159,6 +167,9 @@ class PacmanDeepQAgent(PacmanQAgent):
             self.target_model.set_weights(copy.deepcopy(self.model.parameters))
 
         self.update_amount += 1
+        # if(self.update_amount ==3000):
+        #     self.model.Save_model(str(self.update_amount),self.replay_memory)
+        
 
 
     def final(self, state):

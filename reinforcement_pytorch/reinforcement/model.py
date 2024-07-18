@@ -1,3 +1,5 @@
+import pickle  # 确保在文件顶部导入pickle
+    
 
 """
 Functions you should use.
@@ -24,8 +26,8 @@ class DeepQNetwork(Module):
         # Remember to set self.learning_rate, self.numTrainingGames,
         # and self.batch_size!
         "*** YOUR CODE HERE ***"
-        self.learning_rate = 0.1
-        self.numTrainingGames = 4000
+        self.learning_rate = 0.15
+        self.numTrainingGames = 3300
         self.batch_size = 1024
         self.cnt=0
         import torch
@@ -41,6 +43,7 @@ class DeepQNetwork(Module):
             
             torch.nn.Linear(128, action_dim)
         )
+        self.optimizer = optim.SGD(self.parameters(), lr=self.learning_rate)
         "**END CODE"""
         self.double()
 
@@ -75,15 +78,25 @@ class DeepQNetwork(Module):
         """
         "*** YOUR CODE HERE ***"
         return self.module_(tensor(states, dtype=double))
-    
     def run(self, states):
         return self.forward(states)
-    def Save_model(self):
+
+    # import pickle
+
+    def Save_model(self, suffix, replay_memory):
         import torch
-        torch.save(self.module_, 'model.pth')   
-    def Load_model(self):
+        # 使用torch.save保存模型
+        model_file_name = f"model_{suffix}.pth"
+        torch.save(self.module_.state_dict(), model_file_name)
+        
+        # 保存记忆库到文件
+        memory_file = f"replay_memory_{suffix}.pth"
+        torch.save(replay_memory, memory_file)
+
+        print(f"模型已保存为 {model_file_name}，记忆库已保存为 {memory_file}")
+    def Load_model(self,str:str):
         import torch
-        self.module_=torch.load('model.pth')
+        self.module_=torch.load('model'+str+'.pth')
     def gradient_update(self, states, Q_target):
         """
         Update your parameters by one gradient step with the .update(...) function.
@@ -102,9 +115,9 @@ class DeepQNetwork(Module):
         # if(self.cnt>35000):
         #     tt=0.01
         # print(tt,self.cnt)
-        optimizer = optim.SGD(self.parameters(), lr=tt)
-        optimizer.zero_grad()
+        
+        self.optimizer.zero_grad()
         loss = self.get_loss(states, Q_target)  
         loss.backward()
-        optimizer.step()
+        self.optimizer.step()
         return None
